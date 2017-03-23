@@ -5,20 +5,26 @@ var enemy;
 var enemyImage;
 var backgroundImage;
 
+
+
 function preload() {
-  playerImage = loadImage("https://surrogate.hackedu.us/i.imgur.com/N5uCbDu.png");
-  enemyImage = loadImage("https://surrogate.hackedu.us/i.imgur.com/OdL0XPt.png");
+  playerImage = loadImage("https://ivobrett.github.io/hackclubcode/dodge/images/png/player.png");
+  enemyImage = loadImage("https://ivobrett.github.io/hackclubcode/dodge/images/png/enemyShip.png");
   backgroundImage = loadImage("https://surrogate.hackedu.us/i.imgur.com/aKQOg3G.png");
+
+  playerImageLeft = loadImage("https://ivobrett.github.io/hackclubcode/dodge/images/png/playerLeft.png");
+  playerImageRight = loadImage("https://ivobrett.github.io/hackclubcode/dodge/images/png/playerRight.png");
 }
 
 function setup() {
   isGameOver = false;
-  createCanvas(256, 256);
+  createCanvas(512, 512);
   player = createSprite(width / 2, height - (playerImage.height / 2), 0, 0);
   player.addImage(playerImage);
   enemy = createSprite(width / 2, 0, 0, 0);
   enemy.addImage(enemyImage);
   enemy.rotationSpeed = 4.0;
+
 }
 
 function draw() {
@@ -33,10 +39,15 @@ function draw() {
     }
     background(backgroundImage);
     if (keyDown(RIGHT_ARROW) && player.position.x < (width - (playerImage.width / 2))) {
+        player.addImage(playerImageRight);
       player.position.x += 2;
     }
-    if (keyDown(LEFT_ARROW) && player.position.x > (playerImage.width / 2)) {
+    else if (keyDown(LEFT_ARROW) && player.position.x > (playerImage.width / 2)) {
+        player.addImage(playerImageLeft);
       player.position.x -= 2;
+    }
+    else {
+        player.addImage(playerImage);
     }
     enemy.position.y = enemy.position.y + 3;
     if (enemy.position.y > height) {
