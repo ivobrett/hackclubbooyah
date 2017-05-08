@@ -9,6 +9,10 @@ var GROUND_SPRITE_WIDTH = 50;
 var GROUND_SPRITE_HEIGHT = 50;
 var numGroundSprites;
 
+var level;
+var OBSTACLE_SPRITE_SIDE = 10;
+
+
 var player;
 
 var obstacleSprites;
@@ -16,6 +20,7 @@ var obstacleSprites;
 function setup() {
     isGameOver = false;
     score = 0;
+    level = 1;
     
     createCanvas(400, 300);
     background(150, 200, 250);
@@ -39,6 +44,7 @@ function draw() {
         fill(255);
         textAlign(CENTER);
         text("Your score was: " + score, camera.position.x, camera.position.y - 20);
+        text("You got to level: " + level, camera.position.x, camera.position.y - 40);
         text("Game Over! Click anywhere to restart", camera.position.x, camera.position.y);
     } else {
         background(150, 200, 250);
@@ -50,7 +56,7 @@ function draw() {
             player.position.y = (height-50) - (player.height/2);
         }
         
-        if (keyDown(UP_ARROW)) {
+        if (keyDown(UP_ARROW) &&  player.position.y > 20) {
             player.velocity.y = JUMP;
         }
         
@@ -64,8 +70,8 @@ function draw() {
             groundSprites.add(firstGroundSprite);
         }
         
-        if (random() > 0.95) {
-            var obstacle = createSprite(camera.position.x + width, random(0, (height-50)-15), 30, 30);
+        if (random() > (0.99 - level/1000)) { // adjust for level
+            var obstacle = createSprite(camera.position.x + width, random(0, (height-50)-15), OBSTACLE_SPRITE_SIDE, OBSTACLE_SPRITE_SIDE);
             obstacleSprites.add(obstacle);
         }
         
@@ -74,18 +80,47 @@ function draw() {
             removeSprite(firstObstacle);
         }
         
-        obstacleSprites.overlap(player, endGame);
+//        obstacleSprites.overlap(player, endGame);
+        obstacleSprites.collide(player, scoreUp);
         
         drawSprites();
         
         score = score + 1;
         textAlign(CENTER);
         text(score, camera.position.x, 10);
+
+        if (checkForLevelChange()) {
+            background(255, 255, 255); // flash background to white
+        }
+        
+        //add the level text
+        textAlign(CENTER);
+        text("Level: " + level, camera.position.x, 20);
     }
 }
 
+function scoreUp(jewel, hero)
+{
+    score = score + 1000;
+    jewel.remove();
+}
+ 
+function checkForLevelChange() {
+    var levelChanged = false;
+    //if score has gone up another 500 then change level and increase sprite size
+    if ((score % 500) == 0) { 
+        level = level + 1; //increase the level
+        //increase the sprite size
+        OBSTACLE_SPRITE_SIDE = OBSTACLE_SPRITE_SIDE * level;
+        levelChanged = true;
+    }         
+    return levelChanged;
+}
+
+
 function endGame() {
     isGameOver = true;
+    level = 1;
 }
 
 function mouseClicked() {
